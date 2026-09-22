@@ -1,3 +1,4 @@
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -17,8 +18,41 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { Analytics } from './components/analytics'
 import { Overview } from './components/overview'
 import { RecentSales } from './components/recent-sales'
+import { RegisterPaymentModal } from './components/register-payment-modal'
 
 export function Dashboard() {
+  const [downloading, setDownloading] = useState<boolean>(false)
+
+  const handleDownloadExcel = async () => {
+    setDownloading(true)
+    try {
+      const response = await fetch('http://localhost:3000/consultas-power-bi/exportar-excel', {
+        method: 'GET',
+      })
+
+      if (!response.ok) {
+        throw new Error('Error al generar la exportación')
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+
+      const link = document.createElement('a')
+      link.href = url;
+      link.download = `historial_pagos_${new Date().toISOString().slice(0, 10)}.xlsx`
+      document.body.appendChild(link)
+      link.click()
+
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Error al descargar el archivo Excel:', error)
+      alert('Ocurrió un error al exportar el archivo Excel.')
+    } finally {
+      setDownloading(false)
+    }
+  }
+
   return (
     <>
       {/* ===== Top Heading ===== */}
@@ -82,6 +116,7 @@ export function Dashboard() {
                   </p>
                 </CardContent>
               </Card>
+
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
@@ -109,6 +144,8 @@ export function Dashboard() {
                   </p>
                 </CardContent>
               </Card>
+
+              {/* --- TARJETA SALES CON BOTÓN DE EXPORTACIÓN --- */}
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>Sales</CardTitle>
@@ -126,17 +163,29 @@ export function Dashboard() {
                     <path d='M2 10h20' />
                   </svg>
                 </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+12,234</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +19% from last month
-                  </p>
+                <CardContent className='space-y-3'>
+                  <div>
+                    <div className='text-2xl font-bold'>+12,234</div>
+                    <p className='text-xs text-muted-foreground'>
+                      +19% from last month
+                    </p>
+                  </div>
+                  <Button
+                    onClick={handleDownloadExcel}
+                    disabled={downloading}
+                    size='sm'
+                    className='w-full text-xs bg-emerald-600 hover:bg-emerald-700 text-white'
+                  >
+                    {downloading ? 'Generando...' : 'Exportar Excel'}
+                  </Button>
                 </CardContent>
               </Card>
+
+              {/* --- TARJETA GESTIÓN DE PAGOS --- */}
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
-                    Active Now
+                    Gestión de Pagos
                   </CardTitle>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -151,14 +200,20 @@ export function Dashboard() {
                     <path d='M22 12h-4l-3 9L9 3l-3 9H2' />
                   </svg>
                 </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+573</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +201 since last hour
-                  </p>
+                <CardContent className='flex flex-col justify-between space-y-2'>
+                  <div>
+                    <div className='text-lg font-bold'>Control Rápido</div>
+                    <p className='text-xs text-muted-foreground'>
+                      Registra transferencias o pagos manuales de socios al instante.
+                    </p>
+                  </div>
+                  <div className='pt-1'>
+                    <RegisterPaymentModal />
+                  </div>
                 </CardContent>
               </Card>
             </div>
+
             <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
               <Card className='col-span-1 lg:col-span-4'>
                 <CardHeader>

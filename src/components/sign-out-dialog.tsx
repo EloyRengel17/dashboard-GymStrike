@@ -13,8 +13,13 @@ export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
   const { auth } = useAuthStore()
 
   const handleSignOut = () => {
+    // 1. Reiniciar estado global en Zustand (borra usuario y token del store)
     auth.reset()
-    // Preserve current location for redirect after sign-in
+
+    // 2. Limpiar el respaldo en localStorage
+    localStorage.removeItem('access_token')
+
+    // 3. Guardar ruta actual y redirigir a /sign-in
     const currentPath = location.href
     navigate({
       to: '/sign-in',

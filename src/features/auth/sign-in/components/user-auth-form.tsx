@@ -5,9 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Loader2, LogIn } from 'lucide-react'
 import { toast } from 'sonner'
-import { IconFacebook, IconGithub } from '@/assets/brand-icons'
 import { useAuthStore } from '@/stores/auth-store'
-import { sleep, cn } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -20,14 +19,10 @@ import {
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
 
+// 1. Ajustamos el esquema de Zod para cédula y clave
 const formSchema = z.object({
-  email: z.email({
-    error: (iss) => (iss.input === '' ? 'Please enter your email.' : undefined),
-  }),
-  password: z
-    .string()
-    .min(1, 'Please enter your password.')
-    .min(7, 'Password must be at least 7 characters long.'),
+  cedula: z.string().min(1, 'Por favor ingrese su cédula.'),
+  clave: z.string().min(1, 'Por favor ingrese su clave.'),
 })
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLFormElement> {
@@ -46,39 +41,51 @@ export function UserAuthForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      cedula: '',
+      clave: '',
     },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  // 2. Petición real a la API NestJS
+  async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
 
-    toast.promise(sleep(2000), {
-      loading: 'Signing in...',
-      success: () => {
-        setIsLoading(false)
+    try {
+      const response = await fetch('http://localhost:3000/login-pc/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cedula: data.cedula,
+          clave: data.clave,
+        }),
+      })
 
-        // Mock successful authentication with expiry computed at success time
-        const mockUser = {
-          accountNo: 'ACC001',
-          email: data.email,
-          role: ['user'],
-          exp: Date.now() + 24 * 60 * 60 * 1000, // 24 hours from now
-        }
+      const resData = await response.json()
 
-        // Set user and access token
-        auth.setUser(mockUser)
-        auth.setAccessToken('mock-access-token')
+      if (!response.ok) {
+        throw new Error(resData.message || 'Error al iniciar sesión')
+      }
 
-        // Redirect to the stored location or default to dashboard
-        const targetPath = redirectTo || '/'
-        navigate({ to: targetPath, replace: true })
+      // 3. Guardar token y usuario en el Store de la plantilla (Zustand)
+      auth.setUser(resData.usuario)
+      auth.setAccessToken(resData.access_token)
 
-        return `Welcome back, ${data.email}!`
-      },
-      error: 'Error',
-    })
+      // 4. Guardar también en localStorage por respaldo
+      localStorage.setItem('access_token', resData.access_token)
+
+      toast.success(`¡Bienvenido de nuevo, ${resData.usuario.nombre || data.cedula}!`)
+
+      // 5. Redirigir al dashboard
+      const targetPath = redirectTo || '/'
+      navigate({ to: targetPath, replace: true })
+
+    } catch (error: any) {
+      toast.error(error.message || 'Error de conexión con el servidor')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -88,25 +95,28 @@ export function UserAuthForm({
         className={cn('grid gap-3', className)}
         {...props}
       >
+        {/* Campo Cédula */}
         <FormField
           control={form.control}
-          name='email'
+          name='cedula'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Cédula</FormLabel>
               <FormControl>
-                <Input placeholder='name@example.com' {...field} />
+                <Input placeholder='12345678' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {/* Campo Clave */}
         <FormField
           control={form.control}
-          name='password'
+          name='clave'
           render={({ field }) => (
             <FormItem className='relative'>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>Clave</FormLabel>
               <FormControl>
                 <PasswordInput placeholder='********' {...field} />
               </FormControl>
@@ -115,35 +125,16 @@ export function UserAuthForm({
                 to='/forgot-password'
                 className='absolute inset-e-0 -top-0.5 text-sm font-medium text-muted-foreground hover:opacity-75'
               >
-                Forgot password?
+                ¿Olvidó su clave?
               </Link>
             </FormItem>
           )}
         />
+
         <Button className='mt-2' disabled={isLoading}>
           {isLoading ? <Loader2 className='animate-spin' /> : <LogIn />}
-          Sign in
+          Iniciar Sesión
         </Button>
-
-        <div className='relative my-2'>
-          <div className='absolute inset-0 flex items-center'>
-            <span className='w-full border-t' />
-          </div>
-          <div className='relative flex justify-center text-xs uppercase'>
-            <span className='bg-background px-2 text-muted-foreground'>
-              Or continue with
-            </span>
-          </div>
-        </div>
-
-        <div className='grid grid-cols-2 gap-2'>
-          <Button variant='outline' type='button' disabled={isLoading}>
-            <IconGithub className='h-4 w-4' /> GitHub
-          </Button>
-          <Button variant='outline' type='button' disabled={isLoading}>
-            <IconFacebook className='h-4 w-4' /> Facebook
-          </Button>
-        </div>
       </form>
     </Form>
   )

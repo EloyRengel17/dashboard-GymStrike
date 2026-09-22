@@ -58,15 +58,15 @@ export const sidebarData: SidebarData = {
           icon: LayoutDashboard,
         },
         {
-          title: 'Tasks',
+          title: 'Registro de actividad',
           url: '/tasks',
           icon: ListTodo,
         },
-        {
+       /* {
           title: 'Apps',
           url: '/apps',
           icon: Package,
-        },
+        },*/
         {
           title: 'Chats',
           url: '/chats',
@@ -74,10 +74,11 @@ export const sidebarData: SidebarData = {
           icon: MessagesSquare,
         },
         {
-          title: 'Users',
+          title: 'Usuarios',
           url: '/users',
           icon: Users,
         },
+        /*
         {
           title: 'Secured by Clerk',
           icon: ClerkLogo,
@@ -95,10 +96,12 @@ export const sidebarData: SidebarData = {
               url: '/clerk/user-management',
             },
           ],
+          
         },
+        */
       ],
     },
-    {
+   /* {
       title: 'Pages',
       items: [
         {
@@ -200,6 +203,6 @@ export const sidebarData: SidebarData = {
           icon: HelpCircle,
         },
       ],
-    },
+    },*/
   ],
 }

@@ -1,83 +1,65 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useEffect, useState } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
+import { CheckCircle2, Loader2, MessageSquare } from 'lucide-react';
+
+const API_URL = 'http://192.168.110.65:3000';
 
 export function RecentSales() {
+  const [qrData, setQrData] = useState<{ qr: string; isConnected: boolean } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchQrStatus = async () => {
+      try {
+        const res = await fetch(`${API_URL}/whatsapp/qr`);
+        const data = await res.json();
+        setQrData(data);
+      } catch (error) {
+        console.error('Error al obtener estado de WhatsApp:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQrStatus();
+    // Consultar cada 3 segundos para detectar si ya se conectó en tiempo real
+    const interval = setInterval(fetchQrStatus, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className='space-y-8'>
-      <div className='flex items-center gap-4'>
-        <Avatar className='h-9 w-9'>
-          <AvatarImage src='/avatars/01.png' alt='Avatar' />
-          <AvatarFallback>OM</AvatarFallback>
-        </Avatar>
-        <div className='flex flex-1 flex-wrap items-center justify-between'>
-          <div className='space-y-1'>
-            <p className='text-sm leading-none font-medium'>Olivia Martin</p>
-            <p className='text-sm text-muted-foreground'>
-              olivia.martin@email.com
-            </p>
-          </div>
-          <div className='font-medium'>+$1,999.00</div>
+    <div className='flex flex-col items-center justify-center min-h-[285px] text-center'>
+      {loading ? (
+        <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
+      ) : qrData?.isConnected ? (
+        /* SI YA ESTÁ CONECTADO */
+        <div className='flex flex-col items-center justify-center space-y-3 py-6'>
+          <CheckCircle2 className='h-12 w-12 text-emerald-500 animate-bounce' />
+          <h4 className='font-semibold text-lg text-emerald-600'>¡WhatsApp Conectado!</h4>
+          <p className='text-sm text-muted-foreground max-w-xs'>
+            El servicio de mensajería está vinculado correctamente y listo para operar.
+          </p>
         </div>
-      </div>
-      <div className='flex items-center gap-4'>
-        <Avatar className='flex h-9 w-9 items-center justify-center space-y-0 border'>
-          <AvatarImage src='/avatars/02.png' alt='Avatar' />
-          <AvatarFallback>JL</AvatarFallback>
-        </Avatar>
-        <div className='flex flex-1 flex-wrap items-center justify-between'>
-          <div className='space-y-1'>
-            <p className='text-sm leading-none font-medium'>Jackson Lee</p>
-            <p className='text-sm text-muted-foreground'>
-              jackson.lee@email.com
-            </p>
+      ) : qrData?.qr ? (
+        /* SI NO ESTÁ CONECTADO Y HAY QR DISPONIBLE */
+        <div className='flex flex-col items-center space-y-3'>
+          <p className='text-xs text-muted-foreground'>
+            Escanea este código QR con el WhatsApp de gymStrike:
+          </p>
+          <div className='p-3 bg-white rounded-xl shadow-md border'>
+            <QRCodeSVG value={qrData.qr} size={170} />
           </div>
-          <div className='font-medium'>+$39.00</div>
+          <p className='text-xs text-muted-foreground '>
+           ¡Es necesario estar conectado al whatsapp para enviar informacion a los clientes!
+          </p>
         </div>
-      </div>
-      <div className='flex items-center gap-4'>
-        <Avatar className='h-9 w-9'>
-          <AvatarImage src='/avatars/03.png' alt='Avatar' />
-          <AvatarFallback>IN</AvatarFallback>
-        </Avatar>
-        <div className='flex flex-1 flex-wrap items-center justify-between'>
-          <div className='space-y-1'>
-            <p className='text-sm leading-none font-medium'>Isabella Nguyen</p>
-            <p className='text-sm text-muted-foreground'>
-              isabella.nguyen@email.com
-            </p>
-          </div>
-          <div className='font-medium'>+$299.00</div>
+      ) : (
+        /* ESTADO DE ESPERA INICIAL */
+        <div className='flex flex-col items-center space-y-2'>
+          <Loader2 className='h-6 w-6 animate-spin text-primary' />
+          <p className='text-sm text-muted-foreground'>Esperando código QR del servidor...</p>
         </div>
-      </div>
-
-      <div className='flex items-center gap-4'>
-        <Avatar className='h-9 w-9'>
-          <AvatarImage src='/avatars/04.png' alt='Avatar' />
-          <AvatarFallback>WK</AvatarFallback>
-        </Avatar>
-        <div className='flex flex-1 flex-wrap items-center justify-between'>
-          <div className='space-y-1'>
-            <p className='text-sm leading-none font-medium'>William Kim</p>
-            <p className='text-sm text-muted-foreground'>will@email.com</p>
-          </div>
-          <div className='font-medium'>+$99.00</div>
-        </div>
-      </div>
-
-      <div className='flex items-center gap-4'>
-        <Avatar className='h-9 w-9'>
-          <AvatarImage src='/avatars/05.png' alt='Avatar' />
-          <AvatarFallback>SD</AvatarFallback>
-        </Avatar>
-        <div className='flex flex-1 flex-wrap items-center justify-between'>
-          <div className='space-y-1'>
-            <p className='text-sm leading-none font-medium'>Sofia Davis</p>
-            <p className='text-sm text-muted-foreground'>
-              sofia.davis@email.com
-            </p>
-          </div>
-          <div className='font-medium'>+$39.00</div>
-        </div>
-      </div>
+      )}
     </div>
-  )
+  );
 }

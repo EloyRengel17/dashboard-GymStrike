@@ -17,16 +17,16 @@ export function SignIn() {
     <AuthLayout>
       <Card className='max-w-sm gap-4'>
         <CardHeader>
-          <CardTitle className='text-lg tracking-tight'>Sign in</CardTitle>
+          <CardTitle className='text-lg tracking-tight'>¡Bienvenido a Gymstrike!</CardTitle>
           <CardDescription>
-            Enter your email and password below to log into{' '}
-            <br className='max-sm:hidden' /> your account. Don't have an
-            account?{' '}
+           Ingresa tu cédula y clave a continuación para{' '}
+            <br className='max-sm:hidden' /> acceder a tu cuenta. ¿No tienes cuenta?
+            {' '}
             <Link
               to='/sign-up'
               className='text-nowrap underline underline-offset-4 hover:text-primary'
             >
-              Sign Up
+              Registrate
             </Link>
           </CardDescription>
         </CardHeader>
@@ -35,19 +35,19 @@ export function SignIn() {
         </CardContent>
         <CardFooter>
           <p className='px-8 text-center text-sm text-muted-foreground'>
-            By clicking sign in, you agree to our{' '}
+            Al hacer click en iniciar sesión, aceptas nuestros{' '}
             <a
               href='/terms'
               className='underline underline-offset-4 hover:text-primary'
             >
-              Terms of Service
+              Términos de servicio
             </a>{' '}
-            and{' '}
+            y la{' '}
             <a
               href='/privacy'
               className='underline underline-offset-4 hover:text-primary'
             >
-              Privacy Policy
+              Politíca de privacidad.
             </a>
             .
           </p>

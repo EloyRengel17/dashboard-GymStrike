@@ -40,11 +40,6 @@ export function TasksTable({ data }: DataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
-  // Local state management for table (uncomment to use local-only state, not synced with URL)
-  // const [globalFilter, onGlobalFilterChange] = useState('')
-  // const [columnFilters, onColumnFiltersChange] = useState<ColumnFiltersState>([])
-  // const [pagination, onPaginationChange] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 })
-
   // Synced with URL states (updated to match route search schema defaults)
   const {
     globalFilter,
@@ -107,8 +102,8 @@ export function TasksTable({ data }: DataTableProps) {
   return (
     <div
       className={cn(
-        'max-sm:has-[div[role="toolbar"]]:mb-16', // Add margin bottom to the table on mobile when the toolbar is visible
-        'flex flex-1 flex-col gap-4'
+        'max-sm:has-[div[role="toolbar"]]:mb-16',
+        'flex flex-1 flex-col h-full gap-4' // <-- Añadido 'h-full' para forzar la altura y mostrar la paginación abajo
       )}
     >
       <DataTableToolbar
@@ -127,7 +122,7 @@ export function TasksTable({ data }: DataTableProps) {
           },
         ]}
       />
-      <div className='overflow-hidden rounded-md border'>
+      <div className='overflow-hidden rounded-md border flex-1'>
         <Table className='min-w-xl'>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -190,7 +185,7 @@ export function TasksTable({ data }: DataTableProps) {
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} className='mt-auto' />
+      <DataTablePagination table={table} className='mt-auto py-2' />
       <DataTableBulkActions table={table} />
     </div>
   )

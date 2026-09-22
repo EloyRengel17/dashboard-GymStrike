@@ -9,7 +9,7 @@ export type Actividad = {
   tipoUsuario: 'cliente' | 'admin';
 };
 
-export const columns: ColumnDef<Actividad>[] = [
+export const actividadColumns: ColumnDef<Actividad>[] = [
   {
     accessorKey: 'cedula',
     header: 'Cédula',
@@ -21,12 +21,6 @@ export const columns: ColumnDef<Actividad>[] = [
     cell: ({ row }) => {
       const fecha = row.getValue('horaEntrada') as string;
       return <span>{fecha ? new Date(fecha).toLocaleString() : 'N/A'}</span>;
-    },
-    // Filtro personalizado para comparar la fecha seleccionada con la hora de entrada
-    filterFn: (row, id, value) => {
-      if (!value) return true;
-      const rowDate = new Date(row.getValue(id)).toISOString().split('T')[0];
-      return rowDate === value;
     },
   },
   {
@@ -45,13 +39,14 @@ export const columns: ColumnDef<Actividad>[] = [
     accessorKey: 'tipoUsuario',
     header: 'Tipo de Usuario',
     cell: ({ row }) => {
-      const tipo = row.getValue('tipoUsuario') as string;
+      const tipo = row.getValue('tipoUsuario' as string);
       return (
         <Badge variant={tipo === 'admin' ? 'default' : 'secondary'} className="capitalize">
           {tipo}
         </Badge>
       );
     },
+    // Filtro personalizado para que reconozca los valores del Select
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },

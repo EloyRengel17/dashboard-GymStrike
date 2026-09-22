@@ -1,63 +1,54 @@
-import { DotsHorizontalIcon } from '@radix-ui/react-icons'
-import { type Row } from '@tanstack/react-table'
-import { Trash2, UserPen } from 'lucide-react'
+import { Row } from '@tanstack/react-table'
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { type User } from '../data/schema'
-import { useUsers } from './users-provider'
 
-type DataTableRowActionsProps = {
-  row: Row<User>
+interface DataTableRowActionsProps<TData> {
+  row: Row<TData>
+  onEdit?: () => void
+  onDelete?: () => void
 }
 
-export function DataTableRowActions({ row }: DataTableRowActionsProps) {
-  const { setOpen, setCurrentRow } = useUsers()
+export function DataTableRowActions<TData>({
+  onEdit,
+  onDelete,
+}: DataTableRowActionsProps<TData>) {
+  // Asegúrate de QUE NO EXISTA esta línea aquí dentro:
+  // const { setOpen, setCurrentRow } = useUsers() <--- ELIMINAR
+
   return (
-    <>
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant='ghost'
-            className='flex h-8 w-8 p-0 data-[state=open]:bg-muted'
-          >
-            <DotsHorizontalIcon className='h-4 w-4' />
-            <span className='sr-only'>Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-40'>
-          <DropdownMenuItem
-            onClick={() => {
-              setCurrentRow(row.original)
-              setOpen('edit')
-            }}
-          >
-            Edit
-            <DropdownMenuShortcut>
-              <UserPen size={16} />
-            </DropdownMenuShortcut>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="flex h-8 w-8 p-0 data-[state=open]:bg-muted focus-visible:ring-0"
+        >
+          <MoreHorizontal className="h-4 w-4" />
+          <span className="sr-only">Abrir menú</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-[160px]">
+        {onEdit && (
+          <DropdownMenuItem onClick={onEdit} className="cursor-pointer">
+            <Pencil className="mr-2 h-4 w-4" />
+            Editar
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
+        )}
+        {onDelete && (
           <DropdownMenuItem
-            onClick={() => {
-              setCurrentRow(row.original)
-              setOpen('delete')
-            }}
-            className='text-red-500!'
+            onClick={onDelete}
+            className="cursor-pointer text-red-600 focus:text-red-600"
           >
-            Delete
-            <DropdownMenuShortcut>
-              <Trash2 size={16} />
-            </DropdownMenuShortcut>
+            <Trash2 className="mr-2 h-4 w-4" />
+            Eliminar
           </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
