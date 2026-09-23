@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import { API_URL } from '@/lib/constants';
 
 export default function CedulaLanding() {
   const [cedula, setCedula] = useState('');
@@ -21,7 +22,7 @@ export default function CedulaLanding() {
     setFeedback(null);
 
     try {
-      const respuesta = await axios.post('http://localhost:3000/actividad', {
+      const respuesta = await axios.post(`${API_URL}/actividad`, {
         cedula: String(cedulaLimpia),
       });
 
