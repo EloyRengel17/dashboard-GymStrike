@@ -25,8 +25,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
+import { API_URL } from '@/lib/constants';
 
-const API_URL = 'http://192.168.110.65:3000';
 
 export default function RegistroActividadPage() {
   const [data, setData] = useState<Actividad[]>([]);

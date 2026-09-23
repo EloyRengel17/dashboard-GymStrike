@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
+import { API_URL } from '@/lib/constants';
 
 // 1. Ajustamos el esquema de Zod para cédula y clave
 const formSchema = z.object({
@@ -49,9 +50,9 @@ export function UserAuthForm({
   // 2. Petición real a la API NestJS
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
-
+    
     try {
-      const response = await fetch('http://localhost:3000/login-pc/login', {
+      const response = await fetch(`${API_URL}/login-pc/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

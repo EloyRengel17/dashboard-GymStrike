@@ -31,8 +31,7 @@ import { Search } from '@/components/search';
 import { ThemeSwitch } from '@/components/theme-switch';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-const API_URL = 'http://192.168.110.65:3000';
+import { API_URL } from '@/lib/constants';
 
 export function Tasks() {
   const [data, setData] = useState<Actividad[]>([]);

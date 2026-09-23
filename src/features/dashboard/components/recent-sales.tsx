@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { CheckCircle2, Loader2, MessageSquare } from 'lucide-react';
 
-const API_URL = 'http://192.168.110.65:3000';
+import { API_URL } from '@/lib/constants';
 
 export function RecentSales() {
   const [qrData, setQrData] = useState<{ qr: string; isConnected: boolean } | null>(null);

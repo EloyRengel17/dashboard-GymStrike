@@ -19,14 +19,14 @@ import { Analytics } from './components/analytics'
 import { Overview } from './components/overview'
 import { RecentSales } from './components/recent-sales'
 import { RegisterPaymentModal } from './components/register-payment-modal'
-
+import { API_URL } from '@/lib/constants';
 export function Dashboard() {
   const [downloading, setDownloading] = useState<boolean>(false)
 
   const handleDownloadExcel = async () => {
     setDownloading(true)
     try {
-      const response = await fetch('http://localhost:3000/consultas-power-bi/exportar-excel', {
+      const response = await fetch(`${API_URL}/consultas-power-bi/exportar-excel`, {
         method: 'GET',
       })
 

@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Usuario } from '../index'
+import { API_URL } from '@/lib/constants';
 
 interface UserFormSheetProps {
   open: boolean
@@ -105,8 +106,8 @@ export function UserFormSheet({
     }
 
     const url = isEditing
-      ? `http://localhost:3000/usuarios/${userToEdit.id}`
-      : 'http://localhost:3000/usuarios'
+      ? `${API_URL}/usuarios/${userToEdit.id}`
+      : `${API_URL}/usuarios`
 
     const method = isEditing ? 'PATCH' : 'POST'
 

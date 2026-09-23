@@ -4,7 +4,7 @@ import { UsersTable } from './components/users-table'
 import { UserFormSheet } from './components/user-create-sheet'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
-
+import { API_URL } from '@/lib/constants';
 export interface Usuario {
   id: number
   cedula: string
@@ -33,7 +33,7 @@ export function Users() {
   const obtenerUsuarios = async () => {
     try {
       setLoading(true)
-      const response = await fetch('http://localhost:3000/usuarios')
+      const response = await fetch(`${API_URL}/usuarios`)
       if (!response.ok) throw new Error('Error al conectar con el servidor')
       const data = await response.json()
       setUsuarios(data.usuario || [])
@@ -58,7 +58,7 @@ export function Users() {
     if (!confirm('¿Estás seguro de que deseas eliminar este usuario?')) return
 
     try {
-      const res = await fetch(`http://localhost:3000/usuarios/${id}`, {
+      const res = await fetch(`${API_URL}/usuarios/${id}`, {
         method: 'DELETE',
       })
       if (res.ok) {
